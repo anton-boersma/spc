@@ -1,6 +1,9 @@
 from machine import Pin, PWM
 
-from module import Module
+
+class Module:
+    def update(self):
+        raise NotImplementedError("update methode not implemented")
 
 
 class LEDFader(Module):
@@ -12,3 +15,10 @@ class LEDFader(Module):
     def update(self):
         self.duty += 1
         self.led_pwm.duty_u16(self.duty)
+
+
+modules = [LEDFader("GP15")]
+
+while True:
+    for module in modules:
+        module.update()
