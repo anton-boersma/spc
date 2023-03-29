@@ -1,4 +1,5 @@
 from machine import Pin, PWM
+from utime import sleep_ms
 
 
 class Module:
@@ -22,7 +23,25 @@ class LEDFader(Module):
         self.led_pwm.duty_u16(self.duty)
 
 
-modules = [LEDFader("GP15")]
+class LEDBlink(Module):
+    def __init__(self, led_pin_name):
+        self.led_pin = Pin(led_pin_name, Pin.OUT)
+        self.enabled = False
+
+    def update(self):
+        if self.enabled:
+            self.led_pin.low()
+            self.enabled = False
+        else:
+            self.led_pin.high()
+            self.enabled = True
+        sleep_ms(500)
+
+
+modules = [
+    LEDFader("GP14"),
+    LEDFader("GP15")
+]
 
 while True:
     for module in modules:
