@@ -1,4 +1,4 @@
-from machine import Pin, PWM
+from machine import Pin, PWM, ADC
 from utime import sleep_ms
 
 
@@ -15,7 +15,7 @@ class LEDFader(Module):
         self.increment = 1
 
     def update(self):
-        if self.duty > 2**16 - 1:
+        if self.duty > 2 ** 16 - 1:
             self.increment = -1
         elif self.duty < 1:
             self.increment = 1
@@ -38,12 +38,30 @@ class LEDBlink(Module):
         sleep_ms(500)
 
 
+class POTMeter(Module):
+    def __init__(self, pot_pin_name, led_pin_name):
+        sleep_ms(2000)
+        print("POTMeter loaded.")
+        self.pot_pin = Pin(pot_pin_name, Pin.IN)
+        self.adc = ADC(pot_pin_name)
+        self.value = self.adc.read_u16()
+
+        self.led_pin = Pin(led_pin_name, Pin.OUT)
+        self.led_pwm = PWM(self.led_pin)
+
+    def update(self):
+        self.value = self.adc.read_u16()
+        self.led_pwm.duty_u16(self.value)
+        print(self.value)
+        sleep_ms(250)
+
+
 modules = [
-    LEDFader("GP14"),
-    LEDFader("GP15")
+    # LEDFader("GP14"),  # led pin GP14
+    # LEDFader("GP15"),  # led pin GP15
+    POTMeter(28, 15)  # pot pin number GP28 or ADC2, led pin GP15
 ]
 
 while True:
     for module in modules:
         module.update()
-        # print("check")
