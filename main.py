@@ -4,7 +4,6 @@ from time import ticks_us, ticks_diff
 
 
 class Module:
-    # def update(self, current_time, time_delta):
     def update(self):
         raise NotImplementedError("update methode not implemented")
 
@@ -63,8 +62,7 @@ class POTMeter(Module):
             self.led_pwm.duty_u16(self.value)
             print(self.value)
             self.previous_time = self.current_time
-        # sleep_ms(250)
-        # print(current_time)
+
 
 
 class Speedometer(Module):
@@ -75,7 +73,7 @@ class Speedometer(Module):
     def meting(self):
         pass  # beter om in class functies te maken
 
-    def update(self, current_time, time_delta):
+    def update(self):
         if self.previous is None:
             self.previous = self.meting()
         else:
@@ -125,19 +123,9 @@ def main():
 
     sleep_ms(2000)  # pause voor startup
 
-    # current_time = ticks_us()
-    # time_delta = 0
-
     while True:
         for module in modules:
-            # module.update(current_time, time_delta)
             module.update()
-
-
-        # previous_time = current_time
-        # current_time = ticks_us()
-        # time_delta = ticks_diff(current_time, previous_time)
-        # print(time_delta)
 
 
 if __name__ == '__main__':
