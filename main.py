@@ -57,30 +57,56 @@ class POTMeter(Module):
 
     def update(self):
         self.current_time = ticks_us()
-        if ticks_diff(self.current_time, self.previous_time) >= 1000000:
+        if ticks_diff(self.current_time, self.previous_time) >= 10000:  # time in micro seconds
             self.value = self.adc.read_u16()
             self.led_pwm.duty_u16(self.value)
             print(self.value)
             self.previous_time = self.current_time
 
+#
+# class Speedometer(Module):
+#     def __init__(self, constant):
+#         self.previous = None
+#         self.constant = constant
+#
+#     def meting(self):
+#         pass  # beter om in class functies te maken
+#
+#     def update(self):
+#         if self.previous is None:
+#             self.previous = self.meting()
+#         else:
+#             current = meting() # tijd meting of distance meting
+#             diff = current - self.previous
+#             spood = distance_constant / diff
+#             self.previous = current
+#
 
+#
+# class HallEffectSensor(Module):
+#     def __init__(self, hall_pin_name, led_pin_name):
+#         sleep_ms(2000)
+#         print("Hall effect loading.")
+#         self.hall_pin = Pin(hall_pin_name, Pin.IN)
+#         self.led_pin = Pin(led_pin_name, Pin.OUT)
+#
+#         print("Hall effect loaded.")
+#
+#         self.current_time = ticks_us()
+#         self.previous_time = self.current_time
+#
+#     def update(self):
+#         pass
+#         # try:
+#         #     if self.hall_pin.value() == 0:
+#         #         self.led_pin.value(0)
+#         #         print("HIGH")
+#         #     elif self.hall_pin.value() == 1:
+#         #         self.led_pin.value(1)
+#         #         print("LOW")
+#         #     print(self.hall_pin.value())
+#
 
-class Speedometer(Module):
-    def __init__(self, constant):
-        self.previous = None
-        self.constant = constant
-
-    def meting(self):
-        pass  # beter om in class functies te maken
-
-    def update(self):
-        if self.previous is None:
-            self.previous = self.meting()
-        else:
-            current = meting() # tijd meting of distance meting
-            diff = current - self.previous
-            spood = distance_constant / diff
-            self.previous = current
 
 
 """"
@@ -112,21 +138,18 @@ Strainmeters
 
 """
 
+modules = [
+    # LEDFader("GP14"),  # led pin GP14
+    # LEDFader(15)  # led pin GP15
+    POTMeter(28, 15)  # pot pin number GP28 or ADC2, led pin GP15
+    # Speedometer(constantValue)  # constant value van wiel of
+    # HallEffectSensor(26,15)
+]
 
-def main():
-    modules = [
-        # LEDFader("GP14"),  # led pin GP14
-        # LEDFader("GP15"),  # led pin GP15
-        POTMeter(28, 15)  # pot pin number GP28 or ADC2, led pin GP15
-        # Speedometer(constantValue)  # constant value van wiel of
-    ]
+sleep_ms(2000)  # pause voor startup
 
-    sleep_ms(2000)  # pause voor startup
-
-    while True:
-        for module in modules:
-            module.update()
+while True:
+    for module in modules:
+        module.update()
 
 
-if __name__ == '__main__':
-    main()
