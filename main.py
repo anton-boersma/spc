@@ -5,22 +5,22 @@ from time import ticks_us, ticks_diff
 
 class Module:
     def update(self):
-        raise NotImplementedError("update methode not implemented")
+        raise NotImplementedError("update method not implemented")
 
-    def get_output(self):
+    def get_message(self, message):
+        pass
+
+    def push_message(self):
         pass
 
 
 class POTMeter(Module):
-    def __init__(self, pot_pin_name, led_pin_name):
+    def __init__(self, pot_pin_name):
         sleep_ms(2000)
         print("POTMeter loading.")
-        self.pot_pin_name = pot_pin_name
         self.pot_pin = Pin(pot_pin_name, Pin.IN)
         self.adc = ADC(pot_pin_name)
         self.value = self.adc.read_u16()
-        self.led_pin = Pin(led_pin_name, Pin.OUT)
-        self.led_pwm = PWM(self.led_pin)
 
         print("POTMeter loaded.")
 
@@ -33,37 +33,50 @@ class POTMeter(Module):
         self.current_time = ticks_us()
         if ticks_diff(self.current_time, self.previous_time) >= 10000:  # time in micro seconds, us
             self.value = self.adc.read_u16()
-            self.led_pwm.duty_u16(self.value)
             self.previous_time = self.current_time
 
-    def get_output(self):
-        self.output = [self.pot_pin_name, self.value]
+    def push_message(self):
+        self.output = self.value  # [self.pot_pin, self.value]
+        print(self.output)
         return self.output
 
+    def globalvariable(self):
+        globalvar = 1
+        return globalvar
 
-class Drivetrain(Module):  # aandrijving module
-    def __init__(self):
+
+class CommunicationTest(Module):
+    def __init__(self, message):
         pass
+        # self.message = message
 
     def update(self):
         pass
 
+    def get_message(self, incomingmessage):
+        print("The message is:")
+        print(incomingmessage)
+
+
+message = None
+globalvar = 0
 
 modules = [
-    POTMeter(28, 15)  # pot pin number GP28 or ADC2
+    POTMeter(28)  # pot pin number GP28 or ADC2
+    # CommunicationTest(message)
     # Drivetrain()  # gets
 ]
-
 sleep_ms(2000)  # pause voor startup
 
 while True:
     for module in modules:
         module.update()
-        print(module.get_output())
+        # message = module.push_message()
+        # module.get_message(message)
+        module.globalvariable()
 
     sleep_ms(1000)
-
-
-    # print(value)
+    print(globalvar)
+    # print(message**2)
 
 
