@@ -3,6 +3,7 @@ from utime import sleep_ms
 from time import ticks_us, ticks_diff
 
 
+#  different modules, each in its own class
 class Module:
     def update(self):
         raise NotImplementedError("update method not implemented")
@@ -41,7 +42,7 @@ class POTMeter(Module):
         return self.output
 
     def globalvariable(self):
-        globalvar = 1
+        globalvar += 1
         return globalvar
 
 
@@ -58,9 +59,11 @@ class CommunicationTest(Module):
         print(incomingmessage)
 
 
+#  global variables
 message = None
 globalvar = 0
 
+#  modules to run
 modules = [
     POTMeter(28)  # pot pin number GP28 or ADC2
     # CommunicationTest(message)
@@ -68,6 +71,7 @@ modules = [
 ]
 sleep_ms(2000)  # pause voor startup
 
+#  main loop
 while True:
     for module in modules:
         module.update()
@@ -76,7 +80,7 @@ while True:
         module.globalvariable()
 
     sleep_ms(1000)
-    print(globalvar)
-    # print(message**2)
+    # print(globalvar)
+    print(message**2)
 
 
