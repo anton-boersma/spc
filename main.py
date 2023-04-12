@@ -8,7 +8,7 @@ class Module:
     def update(self):
         raise NotImplementedError("update method not implemented")
 
-    def get_message(self, message):
+    def get_message(self):
         pass
 
     def push_message(self):
@@ -41,18 +41,34 @@ class POTMeter(Module):
         print(self.output)
         return self.output
 
-    def globalvariable(self):
-        globalvar += 1
-        return globalvar
+
+class LEDBlink(Module):
+    def __init__(self, led_pin_name):
+        self.led_pin = Pin(led_pin_name, Pin.OUT)
+        self.enabled = False
+
+        self.current_time = ticks_us()
+        self.previous_time = self.current_time
+
+    def update(self):
+        self.current_time = ticks_us()
+        if ticks_diff(self.current_time, self.previous_time) >= 10000:  # time in micro seconds, us
+            if self.enabled:
+                self.led_pin.low()
+                self.enabled = False
+            else:
+                self.led_pin.high()
+                self.enabled = True
 
 
 class CommunicationTest(Module):
-    def __init__(self, message):
-        pass
-        # self.message = message
+    def __init__(self, led_pin_name, incomingmessage):
+        self.message = incomingmessage
+        self.led_pin = led_pin_name
+        LEDBlink.__init__(self.led_pin)
 
     def update(self):
-        pass
+        LEDBlink.update(self.led_pin)
 
     def get_message(self, incomingmessage):
         print("The message is:")
@@ -61,7 +77,6 @@ class CommunicationTest(Module):
 
 #  global variables
 message = None
-globalvar = 0
 
 #  modules to run
 modules = [
@@ -77,7 +92,7 @@ while True:
         module.update()
         # message = module.push_message()
         # module.get_message(message)
-        module.globalvariable()
+        # module.globalvariable()
 
     sleep_ms(1000)
     # print(globalvar)
