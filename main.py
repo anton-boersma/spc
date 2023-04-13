@@ -4,12 +4,15 @@ from time import ticks_us, ticks_diff
 
 
 class Module:
+    # update method is run repeatedly
     def update(self):
         raise NotImplementedError("update method not implemented")
 
+    # get_output method return a value
     def get_output(self):
         pass
 
+    # get_input method gets value from memory
     def get_input(self):
         pass
 
@@ -18,35 +21,28 @@ class POTMeter(Module):
     def __init__(self, pot_pin_name):
         sleep_ms(2000)
         print("POTMeter loading.")
-        self.pot_pin = Pin(pot_pin_name, Pin.IN)
-        self.adc = ADC(pot_pin_name)
-        self.value = self.adc.read_u16()
+        self.pot_pin = Pin(pot_pin_name, Pin.IN)  # set pot_pin modus to input
+        self.adc = ADC(pot_pin_name)  # create ADC instance for this pin
+        self.value = self.adc.read_u16()  # read voltage of pin using ADC
 
         print("POTMeter loaded.")
 
-        self.current_time = ticks_us()
-        self.previous_time = self.current_time
-
-        self.output = None
+        # time keeping
+        self.current_time = ticks_us()  # read current time
+        self.previous_time = self.current_time  # store current time
 
     def update(self):
         self.current_time = ticks_us()
+
+        # only do the following code after time has elapsed
         if ticks_diff(self.current_time, self.previous_time) >= 10000:  # time in micro seconds, us
             self.value = self.adc.read_u16()
             self.previous_time = self.current_time
             POTMeter.get_output(self)
 
-    # def get_output(self):
-    #     self.output = self.value
-    #     print("The output is:", self.output)
-    #     global POTMeter_output
-    #     POTMeter_output = self.output
-    #     # return self.output
-
     def get_output(self):
-        global POTMeter_output
-        POTMeter_output = self.value
-        # print("The POT value is:", self.value)
+        global POTMeter_output  # get global variable POTMeter_output
+        POTMeter_output = self.value  # give the global variable to class variable
 
 
 class LEDFader(Module):
@@ -69,11 +65,11 @@ class VehicleTest(Module):
     def __init__(self, left_pin_name, middle_pin_name, right_pin_name):
         self.left_pin = Pin(left_pin_name, Pin.OUT)
         self.middle_pin = Pin(middle_pin_name, Pin.OUT)
-        self.right_pin = Pin(right_pin_name, Pin.IN)
+        self.right_pin = Pin(right_pin_name, Pin.OUT)
 
         self.left_pwm = PWM(self.left_pin)
         self.middle_pwm = PWM(self.middle_pin)
-        self.right_pwm = PWM(self.middle_pin)
+        self.right_pwm = PWM(self.right_pin)
 
         self.left_duty = 0
         self.middle_duty = 0
@@ -92,17 +88,17 @@ class VehicleTest(Module):
             self.middle_duty = 0
             self.right_duty = 0
         elif 21845 <= self.input < 43690:
-            self.left_duty = 2**16 - 2
+            self.left_duty = 2**16 - 1
             self.middle_duty = (self.input - 21845) * 3
             self.right_duty = 0
         elif 43690 <= self.input < 65535:
-            self.left_duty = 2**16 - 2
-            self.middle_duty = 2**16 - 2
+            self.left_duty = 2**16 - 1
+            self.middle_duty = 2**16 - 1
             self.right_duty = (self.input - 43690) * 3
         else:
-            self.left_duty = 2**16 - 2
-            self.middle_duty = 2**16 - 2
-            self.right_duty = 2**16 - 2
+            self.left_duty = 2**16 - 1
+            self.middle_duty = 2**16 - 1
+            self.right_duty = 2**16 - 1
 
         self.left_pwm.duty_u16(self.left_duty)
         self.middle_pwm.duty_u16(self.middle_duty)
@@ -129,13 +125,10 @@ modules = [
     VehicleTest(10, 11, 12)  # LED pin numbers GP10 GP11 GP12, Pico pins 14 15 16
 ]
 
-POTMeter_output = 0
+POTMeter_output = 0  # global variable to read POTMeter value
 sleep_ms(2000)  # pause before startup
 print("Modules loaded, program is running.")
 
 while True:
     for module in modules:
         module.update()
-        # module.get_output()
-
-    # print(POTMeter_output)
