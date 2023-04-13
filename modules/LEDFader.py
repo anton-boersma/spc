@@ -7,7 +7,6 @@ class LEDFader(Module):
 
     def update(self):
         if self.duty > 2**16 - 1:
-        if self.duty > 2 ** 16 - 1:
             self.increment = -1
         elif self.duty < 1:
             self.increment = 1

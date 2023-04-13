@@ -7,10 +7,10 @@ class Module:
     def update(self):
         raise NotImplementedError("update method not implemented")
 
-    def get_message(self, message):
+    def get_output(self):
         pass
 
-    def push_message(self):
+    def get_input(self):
         pass
 
 
@@ -34,49 +34,50 @@ class POTMeter(Module):
         if ticks_diff(self.current_time, self.previous_time) >= 10000:  # time in micro seconds, us
             self.value = self.adc.read_u16()
             self.previous_time = self.current_time
+            POTMeter.get_output(self)
 
-    def push_message(self):
-        self.output = self.value  # [self.pot_pin, self.value]
-        print(self.output)
-        return self.output
+    # def get_output(self):
+    #     self.output = self.value
+    #     print("The output is:", self.output)
+    #     global POTMeter_output
+    #     POTMeter_output = self.output
+    #     # return self.output
 
-    def globalvariable(self):
-        globalvar = 1
-        return globalvar
+    def get_output(self):
+        global POTMeter_output
+        POTMeter_output = self.value
 
 
-class CommunicationTest(Module):
-    def __init__(self, message):
-        pass
-        # self.message = message
+class LEDFader(Module):
+    def __init__(self, led_pin_name):
+        self.led_pin = Pin(led_pin_name, Pin.OUT)
+        self.led_pwm = PWM(self.led_pin)
+        self.duty = 0
 
     def update(self):
-        pass
+        self.duty = LEDFader.get_input(self)
+        self.led_pwm.duty_u16(self.duty)
+        # print("The PWM value is:", self.duty)
 
-    def get_message(self, incomingmessage):
-        print("The message is:")
-        print(incomingmessage)
+    def get_input(self):
+        global POTMeter_output
+        return POTMeter_output
 
-
-message = None
-globalvar = 0
 
 modules = [
-    POTMeter(28)  # pot pin number GP28 or ADC2
-    # CommunicationTest(message)
-    # Drivetrain()  # gets
+    POTMeter(28),  # pot pin number GP28 or ADC2
+    LEDFader(10),
+    LEDFader(11),
+    LEDFader(12)
 ]
-sleep_ms(2000)  # pause voor startup
+
+POTMeter_output = 0
+sleep_ms(2000)  # pause before startup
+print("Modules loaded")
 
 while True:
     for module in modules:
         module.update()
-        # message = module.push_message()
-        # module.get_message(message)
-        module.globalvariable()
+        module.get_output()
 
-    sleep_ms(1000)
-    print(globalvar)
-    # print(message**2)
-
-
+    # print(POTMeter_output)
