@@ -62,49 +62,46 @@ class VehicleTest(Module):
         self._middle_pwm = PWM(middle_pin)
         self._right_pwm = PWM(right_pin)
 
-        # declare duty cycle values
-        self._left_duty = 0
-        self._middle_duty = 0
-        self._right_duty = 0
-
-        # declare LED modus
-        self._pwm_correction = 2  # 1 for LED's going sequentially, 2 for LEDs staying lit
-
         # time keeping
         self._previous_time = ticks_us()
 
     def update(self):
         # self.input = VehicleTest.get_input(self)  # get POTMeter value
         value = self._pot_meter.value
+        pwm_correction = 2  # 1 for LED's going sequentially, 2 for LEDs staying lit
 
-        if value < 21845:  # operate left LED
-            self._left_duty = value * 3
-            self._middle_duty = 0
-            self._right_duty = 0
-        elif 21845 <= value < 43690:  # operate middle LED
-            self._left_duty = 2 ** 16 - self._pwm_correction
-            self._middle_duty = (value - 21845) * 3
-            self._right_duty = 0
-        elif 43690 <= value < 65535:  # operate right LED
-            self._left_duty = 2 ** 16 - self._pwm_correction
-            self._middle_duty = 2 ** 16 - self._pwm_correction
-            self._right_duty = (value - 43690) * 3
-        else:  # all LED's at maximum
-            self._left_duty = 2 ** 16 - self._pwm_correction
-            self._middle_duty = 2 ** 16 - self._pwm_correction
-            self._right_duty = 2 ** 16 - self._pwm_correction
+        left_duty = max(0, min(3 * value, 2**16 - pwm_correction))
+        middle_duty = max(0, min(3 * value - 21845, 2**16 - pwm_correction))
+        right_duty = max(0, min(3 * value - 43690, 2**16 - pwm_correction))
+
+        # if value < 21845:  # operate left LED
+        #     self._left_duty = value * 3
+        #     self._middle_duty = 0
+        #     self._right_duty = 0
+        # elif 21845 <= value < 43690:  # operate middle LED
+        #     self._left_duty = 2 ** 16 - self._pwm_correction
+        #     self._middle_duty = (value - 21845) * 3
+        #     self._right_duty = 0
+        # elif 43690 <= value < 65535:  # operate right LED
+        #     self._left_duty = 2 ** 16 - self._pwm_correction
+        #     self._middle_duty = 2 ** 16 - self._pwm_correction
+        #     self._right_duty = (value - 43690) * 3
+        # else:  # all LED's at maximum
+        #     self._left_duty = 2 ** 16 - self._pwm_correction
+        #     self._middle_duty = 2 ** 16 - self._pwm_correction
+        #     self._right_duty = 2 ** 16 - self._pwm_correction
 
         # write PWM signal to the LEDs
-        self._left_pwm.duty_u16(self._left_duty)
-        self._middle_pwm.duty_u16(self._middle_duty)
-        self._right_pwm.duty_u16(self._right_duty)
+        self._left_pwm.duty_u16(left_duty)
+        self._middle_pwm.duty_u16(middle_duty)
+        self._right_pwm.duty_u16(right_duty)
 
         # print out LED PWM values every 2 seconds
         current_time = ticks_us()
         if ticks_diff(current_time, self._previous_time) >= 2000000:  # time in micro seconds, us
-            print('Green value:', self._left_duty)
-            print('Yellow value:', self._middle_duty)
-            print('Red value:', self._right_duty)
+            print('Green value:', left_duty)
+            print('Yellow value:', middle_duty)
+            print('Red value:', right_duty)
             print()
 
             self._previous_time = current_time
