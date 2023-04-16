@@ -44,10 +44,6 @@ class POTMeter(Module):
             self.value = self._adc.read_u16()
             self._previous_time = current_time
 
-    # def get_output(self):
-    #     global POTMeter_output  # get global variable POTMeter_output
-    #     POTMeter_output = self.value  # give the global variable to class variable
-
 
 class VehicleTest(Module):
     def __init__(self, left_pin_name: int, middle_pin_name: int, right_pin_name: int, pot_meter: POTMeter):  # set type of pot_meter to POTMeter
@@ -71,25 +67,8 @@ class VehicleTest(Module):
         pwm_correction = 2  # 1 for LED's going sequentially, 2 for LEDs staying lit
 
         left_duty = max(0, min(3 * value, 2**16 - pwm_correction))
-        middle_duty = max(0, min(3 * value - 21845, 2**16 - pwm_correction))
-        right_duty = max(0, min(3 * value - 43690, 2**16 - pwm_correction))
-
-        # if value < 21845:  # operate left LED
-        #     self._left_duty = value * 3
-        #     self._middle_duty = 0
-        #     self._right_duty = 0
-        # elif 21845 <= value < 43690:  # operate middle LED
-        #     self._left_duty = 2 ** 16 - self._pwm_correction
-        #     self._middle_duty = (value - 21845) * 3
-        #     self._right_duty = 0
-        # elif 43690 <= value < 65535:  # operate right LED
-        #     self._left_duty = 2 ** 16 - self._pwm_correction
-        #     self._middle_duty = 2 ** 16 - self._pwm_correction
-        #     self._right_duty = (value - 43690) * 3
-        # else:  # all LED's at maximum
-        #     self._left_duty = 2 ** 16 - self._pwm_correction
-        #     self._middle_duty = 2 ** 16 - self._pwm_correction
-        #     self._right_duty = 2 ** 16 - self._pwm_correction
+        middle_duty = max(0, min(3 * (value - 21845), 2**16 - pwm_correction))
+        right_duty = max(0, min(3 * (value - 43690), 2**16 - pwm_correction))\
 
         # write PWM signal to the LEDs
         self._left_pwm.duty_u16(left_duty)
@@ -102,14 +81,10 @@ class VehicleTest(Module):
             print('Green value:', left_duty)
             print('Yellow value:', middle_duty)
             print('Red value:', right_duty)
+            print(self._pot_meter.__str__())
             print()
 
             self._previous_time = current_time
-
-    # get POTMeter value from global memory
-    # def get_input(self):
-    #     global POTMeter_output
-    #     return POTMeter_output
 
 
 def main():
@@ -138,7 +113,7 @@ def main():
             module.update()
 
 
-main()
+# main()
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
