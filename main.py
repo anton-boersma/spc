@@ -62,8 +62,7 @@ class VehicleTest(Module):
         self._previous_time = ticks_us()
 
     def update(self):
-        # self.input = VehicleTest.get_input(self)  # get POTMeter value
-        value = self._pot_meter.value
+        value = self._pot_meter.value  # get POTMeter value
         pwm_correction = 2  # 1 for LED's going sequentially, 2 for LEDs staying lit
 
         left_duty = max(0, min(3 * value, 2**16 - pwm_correction))
@@ -91,26 +90,21 @@ def main():
 
     sleep_ms(3000)  # pause before startup
 
-    stuurkolom = POTMeter('stuurkolom', 28)
+    steering_wheel = POTMeter('steering wheel', 28)  # get POTmeter for steering module
 
-    print(stuurkolom)
+    print(steering_wheel)
 
-    # stuurkolom = POTMeter(A)
-    # aandrijving = POTMeter(B)
-
+    # list of modules in the vehicle
     modules = [
-        stuurkolom,  # pot pin number GP28 or ADC2
-        # aandrijving,
-        # stuurkolom,
-        VehicleTest(10, 11, 12, stuurkolom)  # LED pin numbers GP10 GP11 GP12, Pico pins 14 15 16
+        steering_wheel,  # pot pin number GP28 or ADC2
+        VehicleTest(10, 11, 12, steering_wheel)  # LED pin numbers GP10 GP11 GP12, Pico pins 14 15 16
     ]
 
-    # POTMeter_output = 0  # global variable to read POTMeter value
     print("Modules loaded, program is running.")
 
     while True:
         for module in modules:
-            module.update()
+            module.update()  # update each module
 
 
 # main()
