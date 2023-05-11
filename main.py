@@ -1,6 +1,8 @@
-from machine import Pin, PWM, ADC
+from machine import Pin, PWM, ADC, I2C
 from utime import sleep_ms
 from time import ticks_us, ticks_diff
+# from Adafruit_SSD1306 import SSD1306
+# import ssd1306
 
 
 class Module:
@@ -132,6 +134,14 @@ class BrakingModule(Module):
             self._previous_time = current_time
 
 
+class Dashboard(Module):
+    def __init__(self):
+        pass
+
+    def update(self):
+        pass
+
+
 class VehicleTest(Module):
     def __init__(self, left_pin_name: int, middle_pin_name: int, right_pin_name: int, pot_meter: POTMeter):  # set type of pot_meter to POTMeter
         # declare pin variables
@@ -183,6 +193,12 @@ def main():
 
     print(steering_wheel)
 
+    # i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
+    # oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+    #
+    # oled.text("Hello world", 0, 0)
+    # oled.show()
+
     # list of modules in the vehicle
     modules = [
         steering_wheel,  # pot pin number GP28 or ADC2
@@ -200,6 +216,8 @@ def main():
     while True:
         for module in modules:
             module.update()  # update each module
+
+        # oled.show()
 
 
 # main()
