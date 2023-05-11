@@ -45,6 +45,93 @@ class POTMeter(Module):
             self._previous_time = current_time
 
 
+class SteeringModule(Module):
+    def __init__(self, led_pin_name: int, pot_meter: POTMeter):
+        # declare pin variables
+        led_pin = Pin(led_pin_name, Pin.OUT)
+        self._pot_meter = pot_meter
+
+        # declare PWM modus
+        self._pin_pwm = PWM(led_pin)
+
+        # time keeping
+        self._previous_time = ticks_us()
+
+    def update(self):
+        value = self._pot_meter.value  # get POTMeter value
+
+        led_duty = value
+
+        self._pin_pwm.duty_u16(led_duty)
+
+        # print out LED PWM values every 2 seconds
+        current_time = ticks_us()
+        if ticks_diff(current_time, self._previous_time) >= 2000000:  # time in micro seconds, us
+            print('LED value:', led_duty)
+            print(self._pot_meter.__str__())
+            print()
+
+            self._previous_time = current_time
+
+
+class AcceleratorModule(Module):
+    def __init__(self, led_pin_name: int, pot_meter: POTMeter):
+        # declare pin variables
+        led_pin = Pin(led_pin_name, Pin.OUT)
+        self._pot_meter = pot_meter
+
+        # declare PWM modus
+        self._pin_pwm = PWM(led_pin)
+
+        # time keeping
+        self._previous_time = ticks_us()
+
+    def update(self):
+        value = self._pot_meter.value  # get POTMeter value
+
+        led_duty = value
+
+        self._pin_pwm.duty_u16(led_duty)
+
+        # print out LED PWM values every 2 seconds
+        current_time = ticks_us()
+        if ticks_diff(current_time, self._previous_time) >= 2000000:  # time in micro seconds, us
+            print('LED value:', led_duty)
+            print(self._pot_meter.__str__())
+            print()
+
+            self._previous_time = current_time
+
+
+class BrakingModule(Module):
+    def __init__(self, led_pin_name: int, pot_meter: POTMeter):
+        # declare pin variables
+        led_pin = Pin(led_pin_name, Pin.OUT)
+        self._pot_meter = pot_meter
+
+        # declare PWM modus
+        self._pin_pwm = PWM(led_pin)
+
+        # time keeping
+        self._previous_time = ticks_us()
+
+    def update(self):
+        value = self._pot_meter.value  # get POTMeter value
+
+        led_duty = value
+
+        self._pin_pwm.duty_u16(led_duty)
+
+        # print out LED PWM values every 2 seconds
+        current_time = ticks_us()
+        if ticks_diff(current_time, self._previous_time) >= 2000000:  # time in micro seconds, us
+            print('LED value:', led_duty)
+            print(self._pot_meter.__str__())
+            print()
+
+            self._previous_time = current_time
+
+
 class VehicleTest(Module):
     def __init__(self, left_pin_name: int, middle_pin_name: int, right_pin_name: int, pot_meter: POTMeter):  # set type of pot_meter to POTMeter
         # declare pin variables
@@ -91,13 +178,21 @@ def main():
     sleep_ms(3000)  # pause before startup
 
     steering_wheel = POTMeter('steering wheel', 28)  # get POTmeter for steering module
+    accelerator_pedal = POTMeter('accelerator pedal', 27)  # get POTMeter for accelerator pedal
+    brake_pedal = POTMeter('brake pedal', 26)  # get POTMeter for brake pedal
 
     print(steering_wheel)
 
     # list of modules in the vehicle
     modules = [
         steering_wheel,  # pot pin number GP28 or ADC2
-        VehicleTest(10, 11, 12, steering_wheel)  # LED pin numbers GP10 GP11 GP12, Pico pins 14 15 16
+        accelerator_pedal,  # pot pin number GP27 or ADC1
+        brake_pedal,  # pot pin number GP26 or ADC0
+
+        SteeringModule(18, steering_wheel),
+        AcceleratorModule(17, accelerator_pedal),
+        BrakingModule(16, brake_pedal)
+        # VehicleTest(10, 11, 12, steering_wheel)  # LED pin numbers GP10 GP11 GP12, Pico pins 14 15 16
     ]
 
     print("Modules loaded, program is running.")
