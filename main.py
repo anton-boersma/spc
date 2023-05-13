@@ -1,51 +1,9 @@
-from machine import Pin, PWM  # , I2C
+from machine import Pin, PWM, I2C
 from utime import sleep_ms
 from time import ticks_us, ticks_diff
 from libraries import test
 from modules import Module, POTMeter
 import ssd1327
-
-
-# class Module:
-#     # update method is run repeatedly
-#     def update(self):
-#         raise NotImplementedError("update method not implemented")
-
-
-# class POTMeter(Module):
-#
-#     # declare class variables
-#     value: int
-#
-#     def __init__(self, name: str, pot_pin_name: int):
-#         print("POTMeter loading.")
-#
-#         self._name = name
-#
-#         # alle 3 typen variabele hier,
-#         # geen self -> deze method alleen
-#         # wel self. en _ is alleen deze class, ook andere methods
-#         # wel self. zonder _ is variabele die ook naar andere classes gaat
-#         pot_pin = Pin(pot_pin_name, Pin.IN)  # set pot_pin modus to input
-#         self._adc = ADC(pot_pin)  # create ADC instance for this pin
-#         self.value = self._adc.read_u16()  # read voltage of pin using ADC
-#
-#         print("POTMeter loaded.")
-#
-#         # time keeping
-#         self._previous_time = ticks_us()  # store current time
-#         # self._var_name _ indicates var is only used here, must be self. variable
-#
-#     def __str__(self):
-#         return f"POTMeter(name = {self._name}, value = {self.value})"
-#
-#     def update(self):
-#         current_time = ticks_us()  # stack variable, current time is only a thing when update is called
-#
-#         # only do the following code after time has elapsed
-#         if ticks_diff(current_time, self._previous_time) >= 10000:  # time in micro seconds, us
-#             self.value = self._adc.read_u16()
-#             self._previous_time = current_time
 
 
 class SteeringModule(Module):
@@ -186,7 +144,7 @@ class VehicleTest(Module):
 
 def main():
 
-    sleep_ms(5000)  # pause before startup
+    sleep_ms(4000)  # pause before startup
 
     steering_wheel = POTMeter('steering wheel', 28)  # get POTmeter for steering module
     accelerator_pedal = POTMeter('accelerator pedal', 27)  # get POTMeter for accelerator pedal
@@ -198,11 +156,17 @@ def main():
 
     print(steering_wheel)
 
-    # i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
-    # oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+    # i2c = I2C(0, sda=Pin(0, Pin.OUT), scl=Pin(1, Pin.OUT), freq=10000)  # Raspberry Pi Pico
     #
-    # oled.text("Hello world", 0, 0)
-    # oled.show()
+    # display = ssd1327.SSD1327_I2C(128, 128, i2c, addr=0b0111101)
+    #
+    # display.text('Hello World', 0, 0, 255)
+    # display.show()
+    #
+    # display.fill(0)
+    # for y in range(0, 12):
+    #     display.text('Hello World', 0, y * 8, 15 - y)
+    # display.show()
 
     # list of modules in the vehicle
     modules = [
@@ -228,10 +192,6 @@ def main():
         for module in modules:
             module.update()  # update each module
 
-        # oled.show()
-
-
-# main()
 
 if __name__ == '__main__':
     main()
