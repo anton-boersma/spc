@@ -2,7 +2,7 @@ from machine import Pin, PWM, ADC, I2C
 from utime import sleep_ms
 from time import ticks_us, ticks_diff
 # from Adafruit_SSD1306 import SSD1306
-# import ssd1306
+import ssd1327
 
 
 class Module:
@@ -143,7 +143,7 @@ class Dashboard(Module):
 
 
 class VehicleTest(Module):
-    def __init__(self, left_pin_name: int, middle_pin_name: int, right_pin_name: int, pot_meter: POTMeter):  # set type of pot_meter to POTMeter
+    def __init__(self, left_pin_name: int, middle_pin_name: int, right_pin_name: int, pot_meter: POTMeter):  # set type of pot_meter to POTMeter, linked to class name
         # declare pin variables
         left_pin = Pin(left_pin_name, Pin.OUT)
         middle_pin = Pin(middle_pin_name, Pin.OUT)
@@ -164,7 +164,7 @@ class VehicleTest(Module):
 
         left_duty = max(0, min(3 * value, 2**16 - pwm_correction))
         middle_duty = max(0, min(3 * (value - 21845), 2**16 - pwm_correction))
-        right_duty = max(0, min(3 * (value - 43690), 2**16 - pwm_correction))\
+        right_duty = max(0, min(3 * (value - 43690), 2**16 - pwm_correction))
 
         # write PWM signal to the LEDs
         self._left_pwm.duty_u16(left_duty)
@@ -191,6 +191,10 @@ def main():
     accelerator_pedal = POTMeter('accelerator pedal', 27)  # get POTMeter for accelerator pedal
     brake_pedal = POTMeter('brake pedal', 26)  # get POTMeter for brake pedal
 
+    steering_module = SteeringModule(18, steering_wheel)
+    accelerator_module = AcceleratorModule(17, accelerator_pedal)
+    braking_module = BrakingModule(16, brake_pedal)
+
     print(steering_wheel)
 
     # i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
@@ -205,9 +209,15 @@ def main():
         accelerator_pedal,  # pot pin number GP27 or ADC1
         brake_pedal,  # pot pin number GP26 or ADC0
 
-        SteeringModule(18, steering_wheel),
-        AcceleratorModule(17, accelerator_pedal),
-        BrakingModule(16, brake_pedal)
+        steering_module,
+        accelerator_module,
+        braking_module,
+
+        # SteeringModule(18, steering_wheel),
+        # AcceleratorModule(17, accelerator_pedal),
+        # BrakingModule(16, brake_pedal),
+
+        Dashboard(steering_module, accelerator_module, braking_module)
         # VehicleTest(10, 11, 12, steering_wheel)  # LED pin numbers GP10 GP11 GP12, Pico pins 14 15 16
     ]
 
