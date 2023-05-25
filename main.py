@@ -99,8 +99,10 @@ def main():
     pot_meter.__str__()
 
     modules = [
+        # led blink test, werkt
         # LEDBlink(15),  # led pin GP15 WERKT
-        # POTMeter('test meter', 28)
+
+        # led blink adhv potmeter test, werkt
         pot_meter,
         LEDBlinker(15, pot_meter)
     ]
