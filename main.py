@@ -1,4 +1,4 @@
-from machine import Pin, ADC
+from machine import Pin, PWM, ADC
 from utime import sleep_ms
 from time import ticks_us, ticks_diff
 
@@ -60,6 +60,7 @@ class POTMeter(Module):
             self._previous_time = current_time
 
 
+# werkt
 class LEDBlinker(Module):
     def __init__(self, led_pin_name: int, pot_meter: POTMeter):
         self._led_pin = Pin(led_pin_name, Pin.OUT)
@@ -79,10 +80,36 @@ class LEDBlinker(Module):
             self._led_pin.low()
             status = "low"
 
-        # print out LED PWM values every 2 seconds
+        # print out LED values every 2 seconds
         current_time = ticks_us()
         if ticks_diff(current_time, self._previous_time) >= 2000000:  # time in micro seconds, us
             print(status)
+            print(self._pot_meter.__str__())
+            print()
+
+            self._previous_time = current_time
+
+
+# werkt
+class LEDFader(Module):
+    def __init__(self, led_pin_name: int, pot_meter: POTMeter):
+        # declare pin & PWM variables
+        led_pin = Pin(led_pin_name, Pin.OUT)
+        self._pot_meter = pot_meter
+        self._pin_pwm = PWM(led_pin, freq=1000, duty_u16=0)
+
+        # time keeping
+        self._previous_time = ticks_us()
+
+    def update(self):
+        value = self._pot_meter.value
+        led_duty = value - 2
+        self._pin_pwm.duty_u16(led_duty)
+
+        # print out values every 2 seconds
+        current_time = ticks_us()
+        if ticks_diff(current_time, self._previous_time) >= 2000000:
+            print('PWM value:', led_duty)
             print(self._pot_meter.__str__())
             print()
 
@@ -99,12 +126,8 @@ def main():
     pot_meter.__str__()
 
     modules = [
-        # led blink test, werkt
-        # LEDBlink(15),  # led pin GP15 WERKT
-
-        # led blink adhv potmeter test, werkt
         pot_meter,
-        LEDBlinker(15, pot_meter)
+        LEDFader(15, pot_meter)
     ]
 
     while True:
