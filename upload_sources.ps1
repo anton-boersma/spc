@@ -7,3 +7,7 @@ ampy --port COM3 put "$PSScriptRoot\modules" modules
 ampy --port COM3 rmdir libraries
 
 ampy --port COM3 put "$PSScriptRoot\libraries" libraries
+
+ampy --port COM3 rmdir components
+
+ampy --port COM3 put "$PSScriptRoot\components" components

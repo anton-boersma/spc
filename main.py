@@ -1,7 +1,7 @@
-from machine import Pin, PWM, ADC, I2C
+from machine import Pin, PWM, ADC
 from utime import sleep_ms
 from time import ticks_us, ticks_diff
-from libraries.ssd1306 import SSD1306_I2C
+from modules import DashboardModule, FrequencyModule
 
 
 class Module:
@@ -117,41 +117,22 @@ class LEDFader(Module):
             self._previous_time = current_time
 
 
-class Display(Module):
-    def __init__(self):
-        pass
-
-    def update(self):
-        pass
-
-
 def main():
 
-    sleep_ms(5000)  # pause before startup
+    # sleep_ms(5000)  # pause before startup
 
-    print("starting")
-
-    # Opzetten I2C protocol op pinnen
-    oled_i2c = I2C(0, sda=Pin(8), scl=Pin(9))
-
-    # Check of via i2c een chip te vinden is
-    print(oled_i2c.scan())
-
-    # I2C configureren voor ssd1306 display
-    oled = SSD1306_I2C(width=128, height=32, i2c=oled_i2c, addr=0x3d)
-
-    # Nu kunnen we gebruik maken van de functies die beschikbaar zijn
-    # voor het SSD1306 object, inclusief Framebuffer
-    oled.fill(0)
-    oled.text('Hello', 0, 0, 0xffff)
-    oled.text('MicroPython!', 0, 10, 0xffff)
-    oled.hline(0, 20, 95, 0xffff)
-    oled.show()
-
-    print("done")
+    frequency = FrequencyModule()
+    gas_pedal = POTMeter("Gas pedaal", 28)
+    brake_pedal = POTMeter("Rem pedaal", 27)
+    steering_wheel = POTMeter("Stuurwiel", 26)
+    dashboard = DashboardModule(frequency, gas_pedal, brake_pedal, steering_wheel)
 
     modules = [
-
+        frequency,
+        gas_pedal,
+        brake_pedal,
+        steering_wheel,
+        dashboard
     ]
 
     while True:

@@ -1,34 +1,8 @@
-"""
-MicroPython driver for SSD1306 OLED chip
-Author: Stijn Kerst
-Gebaseerd op: https://github.com/stlehmann/micropython-ssd1306
-Github: https://github.com/kerss/hello-pico
-
-Example usage on RP Pico:
-    from machine import Pin, I2C
-    from lib.ssd1306 import SSD1306_I2C
-
-    # Opzetten I2C protocol op pinnen
-    oled_i2c = I2C(0, sda=Pin(8), scl=Pin(9))
-
-    # Check of via i2c een chip te vinden is
-    print(oled_i2c.scan())
-
-    # I2C configureren voor ssd1306 display
-    oled = SSD1306_I2C(width=128, height=32, i2c=oled_i2c, addr=0x3D)
-
-    # Nu kunnen we gebruik maken van de functies die beschikbaar zijn
-    # voor het SSD1306 object, inclusief Framebuffer
-    oled.fill(0)
-    oled.text('Hello', 0, 0, 0xffff)
-    oled.text('MicroPython!', 0, 10, 0xffff)
-    oled.hline(0, 20, 95, 0xffff)
-    oled.show()
-"""
+# MicroPython SSD1306 OLED driver, I2C and SPI interfaces
+# source: https://github.com/stlehmann/micropython-ssd1306/blob/master/ssd1306.py
 
 from micropython import const
 import framebuf
-import machine
 
 
 # register definitions
@@ -129,24 +103,54 @@ class SSD1306(framebuf.FrameBuffer):
 
 
 class SSD1306_I2C(SSD1306):
-    i2c: machine.I2C
-
-    def __init__(self, width, height, i2c, addr=0x3d, external_vcc=False):
+    def __init__(self, width, height, i2c, addr=0x3C, external_vcc=False):
         self.i2c = i2c
         self.addr = addr
-
-        if self.addr not in self.i2c.scan():
-            raise KeyError(f'(SSD1306) adres 0x{self.addr:02X} niet gevonden op i2c bus')
-
-        self.cmd_buf = bytearray(2)
-        self.data_buf = [b"\x40", None]  # Co=0, D/C#=1
+        self.temp = bytearray(2)
+        self.write_list = [b"\x40", None]  # Co=0, D/C#=1
         super().__init__(width, height, external_vcc)
 
     def write_cmd(self, cmd):
-        self.cmd_buf[0] = 0x80  # Co=1, D/C#=0
-        self.cmd_buf[1] = cmd
-        self.i2c.writeto(self.addr, self.cmd_buf)
+        self.temp[0] = 0x80  # Co=1, D/C#=0
+        self.temp[1] = cmd
+        self.i2c.writeto(self.addr, self.temp)
 
     def write_data(self, buf):
-        self.data_buf[1] = buf
-        self.i2c.writevto(self.addr, self.data_buf)
+        self.write_list[1] = buf
+        self.i2c.writevto(self.addr, self.write_list)
+
+
+class SSD1306_SPI(SSD1306):
+    def __init__(self, width, height, spi, dc, res, cs, external_vcc=False):
+        self.rate = 10 * 1024 * 1024
+        dc.init(dc.OUT, value=0)
+        res.init(res.OUT, value=0)
+        cs.init(cs.OUT, value=1)
+        self.spi = spi
+        self.dc = dc
+        self.res = res
+        self.cs = cs
+        import time
+
+        self.res(1)
+        time.sleep_ms(1)
+        self.res(0)
+        time.sleep_ms(10)
+        self.res(1)
+        super().__init__(width, height, external_vcc)
+
+    def write_cmd(self, cmd):
+        self.spi.init(baudrate=self.rate, polarity=0, phase=0)
+        self.cs(1)
+        self.dc(0)
+        self.cs(0)
+        self.spi.write(bytearray([cmd]))
+        self.cs(1)
+
+    def write_data(self, buf):
+        self.spi.init(baudrate=self.rate, polarity=0, phase=0)
+        self.cs(1)
+        self.dc(1)
+        self.cs(0)
+        self.spi.write(buf)
+        self.cs(1)
