@@ -1,5 +1,9 @@
 from machine import Pin, PWM
 
+# SG90 servo data: https://www.tinytronics.nl/shop/nl/mechanica-en-actuatoren/motoren/servomotoren/sg90-mini-servo
+# Source of this library: https://www.upesy.com/blogs/tutorials/pi-pico-servo-motor-sg90-on-micropython# , accessed 2023-06-02
+# license requirements: https://creativecommons.org/licenses/by-nc-nd/4.0/
+
 
 class Servo:
     __servo_pwm_freq = 50
@@ -39,20 +43,3 @@ class Servo:
         self.__angle_conversion_factor = (self.__max_u16_duty - self.__min_u16_duty) / (self.max_angle - self.min_angle)
         self.__motor = PWM(Pin(pin))
         self.__motor.freq(self.__servo_pwm_freq)
-
-
-sleep(5)
-
-print("starting")
-
-sg90_servo = Servo(pin=12)
-
-while True:
-    sg90_servo.move(0)  # turns the servo to 0°.
-    print(0)
-    sleep(3)
-    sg90_servo.move(180)  # turns the servo to 90°.
-    print(0.5)
-    sleep(3)
-
-
