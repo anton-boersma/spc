@@ -2,7 +2,7 @@ from machine import Pin, PWM, ADC
 from utime import sleep_ms
 from time import ticks_us, ticks_diff
 from modules import DashboardModule, FrequencyModule
-from libraries import Servo
+# from libraries import Servo
 
 
 class Module:
@@ -129,15 +129,15 @@ def main():
     brake_pedal = POTMeter("Rem pedaal", 27)
     steering_wheel = POTMeter("Stuurwiel", 26)
     dashboard = DashboardModule(frequency, gas_pedal, brake_pedal, steering_wheel, display_mode)
-    servo = Servo(pin=12)
+    # servo = Servo(pin=12)
 
     modules = [
         frequency,
         gas_pedal,
         brake_pedal,
         steering_wheel,
-        dashboard,
-        servo
+        dashboard
+        # servo
     ]
 
     while True:
