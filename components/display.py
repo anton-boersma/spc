@@ -1,6 +1,9 @@
 from machine import Pin, SPI
 from libraries.ssd1306 import SSD1306_SPI
 
+# https://www.reichelt.nl/nl/nl/developer-boards-display-oled-1-3-128x64-pixel-ssd1306-1--debo-oled-1-3-p235524.html?r=1
+# chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://cdn-reichelt.de/documents/datenblatt/X200/MONOCHROME-OLED-BREAKOUTS.pdf
+
 
 class Display:
 
@@ -21,6 +24,7 @@ class Display:
     def show(self):
         self.display.show()
 
+# pins:
 # Pico => Oled
 # Ground => Gnd
 # 3V3 OUT => Vin
