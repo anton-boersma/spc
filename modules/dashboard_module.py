@@ -16,5 +16,5 @@ class DashboardModule(Module):
     def update(self):
         self.display.clear()
         if self.display_mode == 1:
-            self.display.text(f"Frequency:{self.frequency.frequency} Hz\nGas pedaal:{self.gas_pedal.value}\nRem pedaal:{self.brake_pedal.value}\nStuurwiel: {self.steering_wheel.value}")
+            self.display.text(f"Frequency:{self.frequency.frequency} Hz\nGas pedaal:{self.gas_pedal.value}\nRem pedaal:{self.brake_pedal.value}\nStuurwiel: {self.steering_wheel.value}\n\n")
         self.display.show()

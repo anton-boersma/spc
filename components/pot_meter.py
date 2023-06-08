@@ -1,4 +1,4 @@
-from .module import Module
+from modules.module import Module
 from machine import Pin, ADC
 from time import ticks_us, ticks_diff
 
