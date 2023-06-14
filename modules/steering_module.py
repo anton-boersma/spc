@@ -59,4 +59,3 @@ class SteeringModule(Module):
         self._rv_pin.move(rv_angle)
         self._la_pin.move(la_angle)
         self._ra_pin.move(ra_angle)
-

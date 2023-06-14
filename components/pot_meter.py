@@ -1,6 +1,6 @@
 from modules.module import Module
 from machine import Pin, ADC
-from time import ticks_us, ticks_diff
+from time import ticks_us
 
 
 class POTMeter(Module):
