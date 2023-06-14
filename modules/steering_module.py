@@ -19,7 +19,7 @@ class SteeringModule(Module):
             max_angle = -18.43 * 2
         else:
             max_angle = -12.53 * 2
-        lv_angle = (value-32768)/65535 * max_angle * self._multiplication_factor + 90
+        lv_angle = (value-32768)/65536 * max_angle * self._multiplication_factor + 90
         return lv_angle
 
     def rv_steering_angle(self):
@@ -28,7 +28,7 @@ class SteeringModule(Module):
             max_angle = -18.43 * 2
         else:
             max_angle = -12.53 * 2
-        rv_angle = (value-32768)/65535 * max_angle * self._multiplication_factor + 90
+        rv_angle = (value-32768)/65536 * max_angle * self._multiplication_factor + 90
         return rv_angle
 
     def la_steering_angle(self):
@@ -37,7 +37,7 @@ class SteeringModule(Module):
             max_angle = 18.43 * 2
         else:
             max_angle = 12.53 * 2
-        la_angle = (value-32768)/65535 * max_angle * self._multiplication_factor + 90
+        la_angle = (value-32768)/65536 * max_angle * self._multiplication_factor + 90
         return la_angle
 
     def ra_steering_angle(self):
@@ -46,7 +46,7 @@ class SteeringModule(Module):
             max_angle = 18.43 * 2
         else:
             max_angle = 12.53 * 2
-        ra_angle = (value-32768)/65535 * max_angle * self._multiplication_factor + 90
+        ra_angle = (value-32768)/65536 * max_angle * self._multiplication_factor + 90
         return ra_angle
 
     def update(self):
