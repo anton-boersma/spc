@@ -31,9 +31,4 @@ class POTMeter(Module):
         return f"POTMeter(name = {self._name}, value = {self.value})"
 
     def update(self):
-        current_time = ticks_us()  # stack variable, current time is only a thing when update is called
-
-        # only do the following code after time has elapsed
-        if ticks_diff(current_time, self._previous_time) >= 10000:  # time in micro seconds, us
-            self.value = self._adc.read_u16()
-            self._previous_time = current_time
+        self.value = self._adc.read_u16()

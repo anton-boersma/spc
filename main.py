@@ -1,6 +1,5 @@
-from modules import DashboardModule, FrequencyModule, SteeringModule
+from modules import DashboardModule, FrequencyModule, SteeringModule, DrivetrainModule
 from components import POTMeter
-from libraries import Servo
 
 
 def main():
@@ -10,9 +9,12 @@ def main():
     display_mode = 1
 
     frequency = FrequencyModule()
+
     gas_pedal = POTMeter("Gas pedaal", 28)
     brake_pedal = POTMeter("Rem pedaal", 27)
     steering_wheel = POTMeter("Stuurwiel", 26)
+
+    drivetrain_module = DrivetrainModule(11, 10, 9, 8, gas_pedal)
     steering_module = SteeringModule(15, 14, 13, 12, steering_wheel)
     dashboard = DashboardModule(frequency, gas_pedal, brake_pedal, steering_wheel, steering_module, display_mode)
 
@@ -21,6 +23,7 @@ def main():
         gas_pedal,
         brake_pedal,
         steering_wheel,
+        drivetrain_module,
         steering_module,
         dashboard
     ]
