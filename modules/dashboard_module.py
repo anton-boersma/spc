@@ -3,11 +3,12 @@ from components.display import Display
 from modules.frequency_module import FrequencyModule
 from modules.steering_module import SteeringModule
 from modules.drivetrain_module import DrivetrainModule
+from modules.braking_module import BrakingModule
 
 
 class DashboardModule(Module):
 
-    def __init__(self, frequency: FrequencyModule, gas_pedal, brake_pedal, steering_wheel, steering_module: SteeringModule, drivetrain_module: DrivetrainModule, display_mode: int):
+    def __init__(self, frequency: FrequencyModule, gas_pedal, brake_pedal, steering_wheel, steering_module: SteeringModule, drivetrain_module: DrivetrainModule, braking_module: BrakingModule, display_mode: int):
         self.display = Display(line_height=10)
         self.frequency = frequency
         self.gas_pedal = gas_pedal
@@ -15,6 +16,7 @@ class DashboardModule(Module):
         self.steering_wheel = steering_wheel
         self.steering_module = steering_module
         self.drivetrain_module = drivetrain_module
+        self.braking_module = braking_module
         self.display_mode = display_mode
 
     def update(self):
@@ -25,5 +27,7 @@ class DashboardModule(Module):
             self.display.text(f"Frequency:{self.frequency.frequency} Hz\nLV hoek:{self.steering_module.lv_steering_angle() - 90}\nRV hoek:{self.steering_module.rv_steering_angle() - 90}\nLA hoek:{self.steering_module.la_steering_angle() - 90}\nRA hoek:{self.steering_module.ra_steering_angle() - 90}\n")
         elif self.display_mode == 3:
             self.display.text(f"Frequency:{self.frequency.frequency} Hz\nFront power:{round(self.drivetrain_module.front_power/180*100)}%\nRear power:{round(self.drivetrain_module.rear_power/180*100)}%")
+        elif self.display_mode == 4:
+            self.display.text(f"Frequency:{self.frequency.frequency} Hz\nRem voor:{round(self.braking_module.front_brake/180*100)}%\nRem achter:{round(self.braking_module.rear_brake/180*100)}%")
 
         self.display.show()
