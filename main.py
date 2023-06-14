@@ -14,7 +14,7 @@ def main():
     brake_pedal = POTMeter("Rem pedaal", 27)
     steering_wheel = POTMeter("Stuurwiel", 26)
     steering_module = SteeringModule(15, 14, 13, 12, steering_wheel)
-    dashboard = DashboardModule(frequency, gas_pedal, brake_pedal, steering_wheel, display_mode)
+    dashboard = DashboardModule(frequency, gas_pedal, brake_pedal, steering_wheel, steering_module, display_mode)
 
     modules = [
         frequency,
