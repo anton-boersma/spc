@@ -2,11 +2,20 @@ from .module import Module
 from components.pot_meter import POTMeter
 from machine import Pin
 from utime import ticks_us, ticks_diff
+from libraries import Servo
+
+
+def steering_angle(pot_value):
+    servo_angle = pot_value/65535*180
+    return servo_angle
 
 
 class SteeringModule(Module):
-    def __init__(self, led_pin_name: int, pot_meter: POTMeter):
-        self._led_pin = Pin(led_pin_name, Pin.OUT)
+    def __init__(self, lv_pin_name: int, rv_pin_name: int, la_pin_name: int, ra_pin_name: int, pot_meter: POTMeter):
+        self._lv_pin = Servo(pin=lv_pin_name)
+        self._rv_pin = Pin(rv_pin_name, Pin.OUT)
+        self._la_pin = Pin(la_pin_name, Pin.OUT)
+        self._ra_pin = Pin(ra_pin_name, Pin.OUT)
         self._pot_meter = pot_meter
 
         # time keeping
@@ -15,19 +24,7 @@ class SteeringModule(Module):
     def update(self):
         value = self._pot_meter.value
 
-        if value > 32000:
-            self._led_pin.high()
-            status = "high"
+        lv_angle = steering_angle(value)
 
-        else:
-            self._led_pin.low()
-            status = "low"
+        self._lv_pin.move(lv_angle)
 
-        # print out LED values every 2 seconds
-        current_time = ticks_us()
-        if ticks_diff(current_time, self._previous_time) >= 2000000:  # time in micro seconds, us
-            print(status)
-            print(self._pot_meter.__str__())
-            print()
-
-            self._previous_time = current_time
