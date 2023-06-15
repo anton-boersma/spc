@@ -1,7 +1,5 @@
 # spc software pakket
 
-Deze repository is gearchiveerd.
-
 Dit project bevat de code die ontwikkeld is voor de module PRO30 van de opleiding Automotive te Hogeschool Rotterdam.
 
 main.py bevat de code die gerunt moet worden, de folders libraries en modules bevatten hulp scripts die gebruikt worden.
