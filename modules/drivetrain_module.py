@@ -11,7 +11,7 @@ class DrivetrainModule(Module):
         self._ra_pin = Servo(pin=ra_pin_name)
         self._pot_meter = pot_meter
 
-        self._front_balance = 0.45
+        self._front_balance = 0.5
         self._rear_balance = 1 - self._front_balance
 
         self.front_power = None

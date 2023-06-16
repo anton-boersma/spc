@@ -3,7 +3,7 @@ from components import POTMeter
 
 
 def main():
-    display_mode = 4
+    display_mode = 1
 
     frequency = FrequencyModule()
 
